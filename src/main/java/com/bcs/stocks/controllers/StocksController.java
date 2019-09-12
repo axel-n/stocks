@@ -3,9 +3,11 @@ package com.bcs.stocks.controllers;
 import com.bcs.stocks.models.StockRequest;
 import com.bcs.stocks.models.StockResponse;
 import com.bcs.stocks.stockService.StockService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class StocksController {
@@ -16,8 +18,10 @@ public class StocksController {
         this.stockService = stockService;
     }
 
-    @PostMapping(value = "/stock/statistic")
+    @PostMapping(value = "/stocks/statistic")
     private Mono<StockResponse> getStatisticByParams(@RequestBody StockRequest request) {
-        return Mono.empty();
+
+        log.info("request {}", request);
+        return stockService.getStatisticByParams(request);
     }
 }

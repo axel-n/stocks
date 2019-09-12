@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockResponse {
-    private List<StocksStatistic> allocations;
     private BigDecimal value;
+    private List<StocksStatistic> allocations;
 }
