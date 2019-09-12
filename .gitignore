@@ -1,0 +1,9 @@
+# idea
+.idea
+*.iml
+
+# backend
+logs
+target
+out
+build
