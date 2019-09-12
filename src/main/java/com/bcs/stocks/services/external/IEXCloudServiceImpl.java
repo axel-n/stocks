@@ -1,6 +1,7 @@
 package com.bcs.stocks.services.external;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,11 @@ public class IEXCloudServiceImpl implements IEXCloudService {
 
     private final WebClient webClient = WebClient.create();
 
-    private String apiRootPath = "https://sandbox.iexapis.com/beta";
-    private String token = "Tpk_5719e44a54714e2eac3c3cb80b643e33";
+    @Value("${apiRootPath}")
+    private String apiRootPath;
+
+    @Value("${token}")
+    private String token;
 
     @Override
     public Mono<Map<String, Object>> getDataByStocks(List<String> listSymbols) {
