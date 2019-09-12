@@ -5,6 +5,7 @@ import com.bcs.stocks.models.StockRequest;
 import com.bcs.stocks.models.StockResponse;
 import com.bcs.stocks.models.StocksStatistic;
 import com.bcs.stocks.models.dict.Sector;
+import com.bcs.stocks.services.external.IEXCloudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -20,14 +21,15 @@ public class StockServiceImpl implements StockService {
 
     private Set<String> technologyStocks;
     private Set<String> healthCareStocks;
+    private final IEXCloudService iexCloudService;
 
-    private StockServiceImpl() {
+    private StockServiceImpl(IEXCloudService iexCloudService) {
+        this.iexCloudService = iexCloudService;
         technologyStocks = new HashSet<>(Set.of("AAPL", "HOG", "MDSO"));
         healthCareStocks = new HashSet<>(Set.of("IDRA", "MRSN"));
     }
 
     private Sector getSectorByStock(String stock) {
-        log.info("getSectorByStock. stock {}", stock);
         if (technologyStocks.contains(stock)) {
             return Sector.Technology;
         } else if (healthCareStocks.contains(stock)) {
@@ -39,61 +41,43 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Mono<StockResponse> getStatisticByParams(StockRequest request) {
-        if (request != null && request.getStocks() != null) {
+        log.info("getStatisticByParams start. get request {}", request);
 
+        if (request != null && request.getStocks() != null) {
             return Flux.just(request.getStocks())
                     .flatMap(Flux::fromIterable)
                     .map(StockDto::getSymbol)
                     .collectList()
-                    .flatMap(this::getPriceByListSymbols)
+                    .flatMap(iexCloudService::getDataByStocks)
                     .flatMap(mapWithPrice -> mergePriceAndVolume(mapWithPrice, request))
                     .map(this::mergeStockStatisticByCategory);
-
         } else {
+            log.error("get not valid params");
             return Mono.empty();
         }
     }
 
-    private Mono<Map<String, Object>> getPriceByListSymbols(List<String> listSymbols) {
-
-        log.info("start getPriceByListSymbols. get listSymbols {}", listSymbols);
-
-        // TODO получать реальные цифры
-
-        // mock
-        Map<String, Object> response = new HashMap<>();
-        listSymbols.forEach(symbol -> {
-            Map<String, BigDecimal> symbolData = new HashMap<>();
-            symbolData.put("price", new BigDecimal("100.00"));
-            response.put(symbol, symbolData);
-        });
-
-        return Mono.just(response);
-    }
-
     private Mono<StockRequest> mergePriceAndVolume(Map<String, Object> mapWithPrice, StockRequest request) {
-
-        log.info("start mergePriceAndVolume. get mapWithPrice {}, request {}", mapWithPrice, request);
+        log.info("mergePriceAndVolume start. get mapWithPrice {}, request {}", mapWithPrice, request);
 
         return Flux.just(request.getStocks())
                 .flatMap(Flux::fromIterable)
                 .map(stockDto -> {
-                    Map<String, BigDecimal> symbolData = (Map<String, BigDecimal>) mapWithPrice.get(stockDto.getSymbol());
-                    BigDecimal priceByOneStock = symbolData.get("price");
+                    Map<String, Object> symbolData = (Map<String, Object>) mapWithPrice.get(stockDto.getSymbol());
+                    BigDecimal priceByOneStock = new BigDecimal(symbolData.get("price").toString()).setScale(3, RoundingMode.HALF_EVEN);;
                     BigDecimal priceByVolume = priceByOneStock.multiply(BigDecimal.valueOf(stockDto.getVolume()));
                     stockDto.setPrice(priceByVolume);
                     return stockDto;
                 })
                 .collectList()
                 .map(list -> {
-                    log.info("list {}", list);
                     request.setStocks(list);
                     return request;
                 });
     }
 
     private StockResponse mergeStockStatisticByCategory(StockRequest processedRequest) {
-        log.info("start mergeStockStatisticByCategory. get processedRequest {}", processedRequest);
+        log.info("mergeStockStatisticByCategory start. get processedRequest {}", processedRequest);
 
         Map<Sector, BigDecimal> valueBySector = new HashMap<>();
 
