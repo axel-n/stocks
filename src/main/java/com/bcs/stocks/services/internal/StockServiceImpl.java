@@ -1,4 +1,4 @@
-package com.bcs.stocks.stockService;
+package com.bcs.stocks.services.internal;
 
 import com.bcs.stocks.models.StockDto;
 import com.bcs.stocks.models.StockRequest;
@@ -6,12 +6,10 @@ import com.bcs.stocks.models.StockResponse;
 import com.bcs.stocks.models.StocksStatistic;
 import com.bcs.stocks.models.dict.Sector;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;

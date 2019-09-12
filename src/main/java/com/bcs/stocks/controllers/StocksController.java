@@ -2,7 +2,7 @@ package com.bcs.stocks.controllers;
 
 import com.bcs.stocks.models.StockRequest;
 import com.bcs.stocks.models.StockResponse;
-import com.bcs.stocks.stockService.StockService;
+import com.bcs.stocks.services.internal.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -20,8 +20,6 @@ public class StocksController {
 
     @PostMapping(value = "/stocks/statistic")
     private Mono<StockResponse> getStatisticByParams(@RequestBody StockRequest request) {
-
-        log.info("request {}", request);
         return stockService.getStatisticByParams(request);
     }
 }

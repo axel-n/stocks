@@ -1,8 +1,7 @@
-package com.bcs.stocks.stockService;
+package com.bcs.stocks.services.internal;
 
 import com.bcs.stocks.models.StockRequest;
 import com.bcs.stocks.models.StockResponse;
-import com.bcs.stocks.models.dict.Sector;
 import reactor.core.publisher.Mono;
 
 public interface StockService {
