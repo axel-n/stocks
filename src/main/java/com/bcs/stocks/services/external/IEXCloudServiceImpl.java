@@ -35,8 +35,10 @@ public class IEXCloudServiceImpl implements IEXCloudService {
                 .uri(url)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
+                .filter(response -> !response.statusCode().isError())
                 .flatMap(body -> body.bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 }));
+
 
     }
 }

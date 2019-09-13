@@ -1,0 +1,24 @@
+{
+  "stocks": [
+    {
+      "symbol": "AAPL",
+      "volume": 50
+    },
+    {
+      "symbol": "HOG",
+      "volume": 10
+    },
+    {
+      "symbol": "MDSO",
+      "volume": 1
+    },
+    {
+      "symbol": "IDRA",
+      "volume": 1
+    },
+    {
+      "symbol": "MRSN",
+      "volume": 1000
+    }
+  ]
+}

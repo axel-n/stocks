@@ -62,9 +62,11 @@ public class StockServiceImpl implements StockService {
 
         return Flux.just(request.getStocks())
                 .flatMap(Flux::fromIterable)
+                .filter(stockDto -> mapWithPrice.get(stockDto.getSymbol()) != null)
                 .map(stockDto -> {
                     Map<String, Object> symbolData = (Map<String, Object>) mapWithPrice.get(stockDto.getSymbol());
-                    BigDecimal priceByOneStock = new BigDecimal(symbolData.get("price").toString()).setScale(3, RoundingMode.HALF_EVEN);;
+
+                    BigDecimal priceByOneStock = new BigDecimal(symbolData.get("price").toString()).setScale(3, RoundingMode.HALF_EVEN);
                     BigDecimal priceByVolume = priceByOneStock.multiply(BigDecimal.valueOf(stockDto.getVolume()));
                     stockDto.setPrice(priceByVolume);
                     return stockDto;
